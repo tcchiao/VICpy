@@ -560,12 +560,14 @@ def calc_grid(lats, lons, decimals=4):
     if lats.min() < -55 and lats.max() > 70:
         # assume global grid
         print('assuming grid is meant to be global...')
+	print(lats.min())
+	print(lats.max())
         target_grid['longitude'] = np.linspace(-180+lon_step[0]/2,
                                                180-lon_step[0]/2,
                                                360/lon_step[0])
-        target_grid['latitude'] = np.linspace(-90+lat_step[0]/2,
-                                              90-lat_step[0]/2,
-                                              180/lat_step[0])
+        target_grid['latitude'] = np.linspace(-54.75+lat_step[0]/2,
+                                              83.75-lat_step[0]/2,
+                                              138.50/lat_step[0])
     else:
         target_grid['longitude'] = np.arange(lons.min(),
                                              lons.max()+lon_step[0],
