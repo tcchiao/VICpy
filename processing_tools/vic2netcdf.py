@@ -1216,7 +1216,7 @@ def calc_grid(lats, lons, decimals=4):
     print('found {0} unique lats'.format(len(lat)))
 
     y, x = latlon2yx(lats, lons, lat, lon)
-
+    # Possible error here using len(lat) and len(lon) to create the mask size because of empty rows
     mask = np.zeros((len(lat), len(lon)), dtype=int)
 
     mask[y, x] = 1

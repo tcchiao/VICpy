@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Script for writing VIC ascii format parameter files from netcdf format.
 """
@@ -312,8 +313,10 @@ def soil(data, xinds, yinds, soil_file):
             dtypes[col] = f.soil_param[var]
 
     print('writing soil parameter file: {}'.format(soil_file))
+    
+    sorted_soilparams = soil_params[np.argsort(soil_params[:,1])]
 
-    np.savetxt(soil_file, soil_params, fmt=dtypes)
+    np.savetxt(soil_file, sorted_soilparams, fmt=dtypes)
 
     print('done with soil file')
 
@@ -335,11 +338,18 @@ def veg(data, xinds, yinds, veg_file, rootzones=2, GLOBAL_LAI=True):
 
     # counter for bad grid cells
     count = 0
+    
+    # sort xinds and yinds by the cell number (gridcell)
+    cellnum = []
+    for y, x in zip(yinds, xinds):
+	cellnum = np.append(cellnum, data['gridcell'][y, x])
+    sorted_index = sorted(zip(cellnum,yinds,xinds), key=lambda x: x[0])
 
     f = open(veg_file, 'w')
 
-    for y, x in zip(yinds, xinds):
-        gridcell = int(data['gridcell'][y, x])
+    for gridcell, y, x in sorted_index:
+    #for y, x in zip(yinds, xinds):
+        #gridcell = int(data['gridcell'][y, x])
         Nveg = int(data['Nveg'][y, x])
         Cv = data['Cv'][:, y, x]
         veg_class = np.nonzero(Cv)[0]
@@ -347,7 +357,7 @@ def veg(data, xinds, yinds, veg_file, rootzones=2, GLOBAL_LAI=True):
         if not len(veg_class) == Nveg:
             count += 1
 
-        line1 = str(gridcell)+' '+str(Nveg)+'\n'
+        line1 = str(int(gridcell))+' '+str(Nveg)+'\n'
         f.write(line1)
         if Nveg > 0:
             for j in veg_class:
@@ -385,6 +395,7 @@ def find_gridcells(mask):
     cells = np.sum(mask)
 
     xinds, yinds = np.nonzero(mask > 0)
+    print('found {} active gridcells in the mask'.format(cells))
 
     return cells, xinds, yinds
 # -------------------------------------------------------------------- #
